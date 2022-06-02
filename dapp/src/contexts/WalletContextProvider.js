@@ -17,7 +17,7 @@ import { useCallback, useMemo } from "react";
 
 const WalletContextProvider = (props) => {
   const network = WalletAdapterNetwork.Devnet;
-  const endpoint = useMemo(() => clusterApiUrl(network), [network]);
+  const endpoint = useMemo(() => clusterApiUrl(network), [ network ]);
 
   const wallets = useMemo(
     () => [
@@ -27,7 +27,7 @@ const WalletContextProvider = (props) => {
       new SolletExtensionWalletAdapter({ network }),
       new TorusWalletAdapter(),
     ],
-    [network]
+    [ network ]
   );
 
   const onError = useCallback((error) => {

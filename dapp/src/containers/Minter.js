@@ -25,6 +25,8 @@ import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import * as anchor from "@project-serum/anchor";
 import { Program } from "@project-serum/anchor";
 
+// import { Metadata } from "@metaplex-foundation/mpl-token-metadata";
+
 import {
   TOKEN_PROGRAM_ID,
   createAssociatedTokenAccountInstruction,
@@ -40,7 +42,7 @@ const TOKEN_METADATA_PROGRAM_ID = new anchor.web3.PublicKey(
 );
 
 const SOL_MINT_NFT_PROGRAM_ID = new anchor.web3.PublicKey(
-  "9FKLho9AUYScrrKgJbG1mExt5nSgEfk1CNEbR8qBwKTZ"
+  "2xTHEroq14L31pLjXFrpNDgARCMoHh9eXLSTUexq9RE4"
 );
 
 const NFT_SYMBOL = "ani-nft";
@@ -56,13 +58,13 @@ const Minter = () => {
   const { connection } = useConnection();
   const wallet = useWallet();
 
-  const [form] = useForm();
-  const [imageFileBuffer, setImageFileBuffer] = useState(null);
-  const [saleType, setSaleType] = useState("no_sale");
+  const [ form ] = useForm();
+  const [ imageFileBuffer, setImageFileBuffer ] = useState(null);
+  const [ saleType, setSaleType ] = useState("no_sale");
 
-  const [uploading, setUploading] = useState(false);
-  const [minting, setMinting] = useState(false);
-  const [mintSuccess, setMintSuccess] = useState(false);
+  const [ uploading, setUploading ] = useState(false);
+  const [ minting, setMinting ] = useState(false);
+  const [ mintSuccess, setMintSuccess ] = useState(false);
 
   const onFileSelected = (file) => {
     const reader = new window.FileReader();
@@ -169,7 +171,7 @@ const Minter = () => {
   };
 
   const mint = async (name, symbol, metadataUrl) => {
-    const provider = new anchor.AnchorProvider(connection, wallet);
+    const provider = new anchor.AnchorProvider(connection, wallet, anchor.AnchorProvider.defaultOptions());
     anchor.setProvider(provider);
 
     const program = new Program(
@@ -233,7 +235,7 @@ const Minter = () => {
 
     try {
       const signature = await wallet.sendTransaction(mint_tx, connection, {
-        signers: [mintKey],
+        signers: [ mintKey ],
       });
       await connection.confirmTransaction(signature, "confirmed");
     } catch {
@@ -247,31 +249,31 @@ const Minter = () => {
     console.log("Metadata address: ", metadataAddress.toBase58());
 
     try {
-      const tx = program.transaction.mintNft(
+      const tx = await program.methods.mintNft(
         mintKey.publicKey,
         name,
         symbol,
-        metadataUrl,
-        {
-          accounts: {
-            mintAuthority: provider.wallet.publicKey,
-            mint: mintKey.publicKey,
-            tokenAccount: nftTokenAccount,
-            tokenProgram: TOKEN_PROGRAM_ID,
-            metadata: metadataAddress,
-            tokenMetadataProgram: TOKEN_METADATA_PROGRAM_ID,
-            payer: provider.wallet.publicKey,
-            systemProgram: anchor.web3.SystemProgram.programId,
-            rent: anchor.web3.SYSVAR_RENT_PUBKEY,
-          },
-        }
-      );
+        metadataUrl
+      )
+        .accounts({
+          mintAuthority: provider.wallet.publicKey,
+          mint: mintKey.publicKey,
+          tokenAccount: nftTokenAccount,
+          tokenProgram: TOKEN_PROGRAM_ID,
+          metadata: metadataAddress,
+          tokenMetadataProgram: TOKEN_METADATA_PROGRAM_ID,
+          payer: provider.wallet.publicKey,
+          systemProgram: anchor.web3.SystemProgram.programId,
+          rent: anchor.web3.SYSVAR_RENT_PUBKEY,
+        })
+        .transaction();
 
       const signature = await wallet.sendTransaction(tx, connection);
       await connection.confirmTransaction(signature, "confirmed");
       console.log("Mint Success!");
       return true;
-    } catch {
+    } catch (error) {
+      console.log(error)
       return false;
     }
   };
@@ -301,12 +303,12 @@ const Minter = () => {
     <Row style={{ margin: 60 }}>
       {minting && (
         <Col span={16} offset={4}>
-          <Alert message="Minting..." type="info" showIcon />
+          <Alert message="Minting..." type="info" showIcon/>
         </Col>
       )}
       {uploading && (
         <Col span={16} offset={4}>
-          <Alert message="Uploading image..." type="info" showIcon />
+          <Alert message="Uploading image..." type="info" showIcon/>
         </Col>
       )}
       <Col span={16} offset={4} style={{ marginTop: 10 }}>
@@ -323,7 +325,7 @@ const Minter = () => {
                 <Form.Item
                   label="Image"
                   name="image"
-                  rules={[{ required: true, message: "Please select image!" }]}
+                  rules={[ { required: true, message: "Please select image!" } ]}
                 >
                   <Upload.Dragger
                     name="image"
@@ -332,7 +334,7 @@ const Minter = () => {
                     height={400}
                   >
                     <p className="ant-upload-drag-icon">
-                      <InboxOutlined />
+                      <InboxOutlined/>
                     </p>
                     <p className="ant-upload-text">
                       Click or drag file to this area to upload
@@ -347,9 +349,9 @@ const Minter = () => {
                 <Form.Item
                   label="Name"
                   name="name"
-                  rules={[{ required: true, message: "Please input name!" }]}
+                  rules={[ { required: true, message: "Please input name!" } ]}
                 >
-                  <Input placeholder="Input nft name here." />
+                  <Input placeholder="Input nft name here."/>
                 </Form.Item>
 
                 <Form.Item
@@ -359,7 +361,7 @@ const Minter = () => {
                     { required: true, message: "Please input description!" },
                   ]}
                 >
-                  <Input.TextArea placeholder="Input nft description here." />
+                  <Input.TextArea placeholder="Input nft description here."/>
                 </Form.Item>
 
                 <Form.Item label="Traits">
@@ -375,7 +377,7 @@ const Minter = () => {
                             },
                           ]}
                         >
-                          <Input addonBefore="Size" placeholder="size" />
+                          <Input addonBefore="Size" placeholder="size"/>
                         </Form.Item>
                       </Col>
                       <Col span={8}>
@@ -388,7 +390,7 @@ const Minter = () => {
                             },
                           ]}
                         >
-                          <Input addonBefore="Live in" placeholder="live in" />
+                          <Input addonBefore="Live in" placeholder="live in"/>
                         </Form.Item>
                       </Col>
                       <Col span={8}>
@@ -401,7 +403,7 @@ const Minter = () => {
                             },
                           ]}
                         >
-                          <Input addonBefore="Food" placeholder="food" />
+                          <Input addonBefore="Food" placeholder="food"/>
                         </Form.Item>
                       </Col>
                     </Row>
@@ -440,7 +442,7 @@ const Minter = () => {
                   <Form.Item
                     name="price"
                     label="Price"
-                    rules={[{ required: true, message: "Please input price!" }]}
+                    rules={[ { required: true, message: "Please input price!" } ]}
                   >
                     <InputNumber
                       style={{ width: "100%" }}
