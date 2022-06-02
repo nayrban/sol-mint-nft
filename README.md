@@ -15,7 +15,7 @@ Anchor based project to mint a nft.
 > Anchor: Solana development framework.
 
 ### 📝 Description
-I have built Anchor based solana program to mint NFT and deployed to devnet.
+I have built Anchor based solana program to mint NFT and deployed to *devnet*.
 
 Devnet Address:
 https://explorer.solana.com/address/9FKLho9AUYScrrKgJbG1mExt5nSgEfk1CNEbR8qBwKTZ
