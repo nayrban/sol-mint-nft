@@ -42,7 +42,7 @@ const TOKEN_METADATA_PROGRAM_ID = new anchor.web3.PublicKey(
 );
 
 const SOL_MINT_NFT_PROGRAM_ID = new anchor.web3.PublicKey(
-  "2xTHEroq14L31pLjXFrpNDgARCMoHh9eXLSTUexq9RE4"
+  SolMintNftIdl.metadata.address
 );
 
 const NFT_SYMBOL = "ani-nft";
