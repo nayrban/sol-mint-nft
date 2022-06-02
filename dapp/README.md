@@ -1,3 +1,7 @@
+# This example is working using Solana DEVNET
+
+Always use relative path to your wallet id.json file
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
